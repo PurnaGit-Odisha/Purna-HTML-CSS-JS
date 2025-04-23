@@ -1,0 +1,1522 @@
+class ZCL_OLE2_OBJECT definition
+  public
+  final
+  create public .
+
+public section.
+
+  types:
+    BEGIN OF gty_st_string,
+        val TYPE string,
+      END OF   gty_st_string .
+  types:
+    BEGIN OF gty_st_char255,
+        val TYPE char255,
+      END OF   gty_st_char255 .
+  types:
+    gty_tt_char255 TYPE STANDARD TABLE OF gty_st_char255 .
+  types:
+    gty_tt_string TYPE STANDARD TABLE OF gty_st_string .
+  types:
+    gty_tt_char1500 TYPE STANDARD TABLE OF char1500 .
+  types:
+    dec5_2 TYPE p DECIMALS 2 LENGTH 7 .
+
+  constants C_COL_BLACK type I value 0 ##NO_TEXT.
+  constants C_COL_WHITE type I value 16777215 ##NO_TEXT.
+  constants C_COL_RED type I value 255 ##NO_TEXT.
+  constants C_COL_GREEN type I value 5287936 ##NO_TEXT.
+  constants C_COL_BLUE type I value 12611584 ##NO_TEXT.
+  constants C_COL_YELLOW type I value 65535 ##NO_TEXT.
+  constants C_COL_ORANGE type I value 49407 ##NO_TEXT.
+  constants C_HA_LEFT type I value -4131 ##NO_TEXT.
+  constants C_A_CENTER type I value -4108 ##NO_TEXT.
+  constants C_HA_RIGHT type I value -4152 ##NO_TEXT.
+  constants C_VA_TOP type I value -4160 ##NO_TEXT.
+  constants C_VA_BOTTOM type I value -4107 ##NO_TEXT.
+  constants C_ORI_PORTRAIT type I value 1 ##NO_TEXT.
+  constants C_ORI_LANDSCAPE type I value 2 ##NO_TEXT.
+  constants C_UL_NONE type I value -4142 ##NO_TEXT.
+  constants C_UL_SINGLE type I value 2 ##NO_TEXT.
+  constants C_UL_DOUBLE type I value -4119 ##NO_TEXT.
+
+  methods CONSTRUCTOR
+    importing
+      !I_VISIBLE type I default 1
+      !I_WSNAME type CHAR30 default 'Sheet1'
+      !I_WBNAME type CHAR30 default 'Book1'
+      !I_PATH type STRING optional
+      !I_MODE type CHAR1 default 'C'
+    exceptions
+      EMPTY_PATH
+      MISSING_FILENAME .
+  methods ADD_HEADER_VIA_FCAT
+    importing
+      !IT_FCAT type LVC_T_FCAT .
+  methods ADD_LINE
+    importing
+      !IS_LINE type ANY
+      !I_FCAT type CHAR1 optional .
+  methods ADD_LINE_VIA_TAB
+    importing
+      !IT_TABLE type GTY_TT_STRING .
+  methods ADD_LINES_VIA_TAB
+    importing
+      !IT_TABLE type ANY TABLE
+      !I_FCAT type CHAR1 optional .
+  methods SET_FORMAT
+    importing
+      !I_BGNROW type I
+      !I_BGNCOL type I
+      !I_ENDROW type I
+      !I_ENDCOL type I
+      !I_FNAME type STRING optional
+      !I_FCOLOR type I optional
+      !I_FBOLD type I optional
+      !I_FSIZE type DEC5_2 optional
+      !I_FITLC type I optional
+      !I_FULINE type I optional
+      !I_BCOLOR type I optional
+      !I_MERGE type CHAR1 optional
+      !I_NFDEC type CHAR255 optional .
+  methods SET_BORDER
+    importing
+      !I_BGNROW type I
+      !I_BGNCOL type I
+      !I_ENDROW type I
+      !I_ENDCOL type I
+      !I_TRBLI type CHAR5 .
+  methods SET_ALIGNMENT
+    importing
+      !I_BGNROW type I
+      !I_BGNCOL type I
+      !I_ENDROW type I
+      !I_ENDCOL type I
+      !I_HALIGN type I optional
+      !I_VALIGN type I optional
+      !I_WRAPTX type CHAR1 optional
+      !I_ORIENT type I optional .
+  methods SET_AUTOFILL
+    importing
+      !I_SRC_BGNROW type I
+      !I_SRC_BGNCOL type I
+      !I_SRC_ENDROW type I
+      !I_SRC_ENDCOL type I
+      !I_DES_BGNROW type I
+      !I_DES_BGNCOL type I
+      !I_DES_ENDROW type I
+      !I_DES_ENDCOL type I .
+  methods SET_AUTOFIT
+    importing
+      !I_COL type CHAR10 optional
+      !I_ROW type CHAR10 optional .
+  methods SET_COL_WIDTH
+    importing
+      !I_COL type CHAR10 optional
+      !I_WIDTH type DEC5_2 .
+  methods SET_ROW_HEIGHT
+    importing
+      !I_ROW type CHAR10 optional
+      !I_HEIGHT type DEC5_2 .
+  methods SET_PAGESETUP
+    importing
+      !I_FITTOPAGESWIDE type I default 1
+      !I_FITTOPAGESTALL type I default 1
+      !I_TOPMARGIN type DEC5_2 optional
+      !I_RIGHTMARGIN type DEC5_2 optional
+      !I_BOTTOMMARGIN type DEC5_2 optional
+      !I_LEFTMARGIN type DEC5_2 optional
+      !I_HEADERMARGIN type DEC5_2 optional
+      !I_FOOTERMARGIN type DEC5_2 optional
+      !I_ORIENTATION type I default C_ORI_PORTRAIT .
+  methods SET_IMAGE
+    importing
+      !I_PATH type STRING
+      !I_LEFT type I
+      !I_TOP type I
+      !I_WIDTH type I
+      !I_HEIGHT type I .
+  methods SET_VALUE
+    importing
+      !I_ROW type I
+      !I_COL type I
+      !I_VALUE type SIMPLE .
+  methods GET_VALUE
+    importing
+      !I_ROW type I
+      !I_COL type I
+    returning
+      value(R_VALUE) type CHAR1500 .
+  methods GET_ROW_COUNT
+    returning
+      value(E_COUNT) type I .
+  methods GET_APP_OBJECT
+    returning
+      value(R_APPLICATION) type OLE2_OBJECT .
+  methods CLIPBOARD_EXPORT
+    importing
+      !I_ROW type I
+      !I_COL type I .
+  methods SAVE_DOCUMENT
+    importing
+      !I_VISIBLE type I default 1
+      !I_COMPCHECK type I default 0
+      !I_REPLACEFILE type I default 1 .
+  methods CLEAR_CLIPBOARD .
+  methods FREE
+    importing
+      !I_FORCE type CHAR1 default 'X' .
+  methods PRINT .
+  class-methods READ_EXCEL
+    importing
+      !FILENAME type STRING
+      !HEADER_ROW type I default 1
+      !COLUMNS type I
+    changing
+      value(TABLE) type STANDARD TABLE
+    returning
+      value(DATA) type ref to DATA
+    exceptions
+      CONVERSION_ERROR .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+    TYPES:
+      gty_dec_16_13 TYPE p LENGTH 16 DECIMALS 13 .
+
+    CONSTANTS c_rs_r1c1 TYPE i VALUE -4150 ##NO_TEXT.
+    CONSTANTS c_rs_a1 TYPE i VALUE 1 ##NO_TEXT.
+    CONSTANTS c_ws_minimized TYPE i VALUE -4140 ##NO_TEXT.
+    CONSTANTS c_ws_normal TYPE i VALUE -4143 ##NO_TEXT.
+    CONSTANTS c_ws_maximized TYPE i VALUE -4137 ##NO_TEXT.
+    DATA application TYPE ole2_object .
+    DATA workbook TYPE ole2_object .
+    DATA workbooks TYPE ole2_object .
+    DATA worksheet TYPE ole2_object .
+    DATA worksheets TYPE ole2_object .
+    DATA path TYPE string .
+    DATA gt_data TYPE gty_tt_char1500 .
+    DATA gs_data TYPE char1500 .
+    DATA t_fcat TYPE lvc_t_fcat .
+
+    METHODS create_object
+      IMPORTING
+        !i_visible TYPE i
+        !i_wsname  TYPE char30
+        !i_mode    TYPE char1 DEFAULT 'C' .
+    METHODS conv_cm2inch
+      IMPORTING
+        !i_input        TYPE dec5_2
+      RETURNING
+        VALUE(r_output) TYPE gty_dec_16_13 .
+    METHODS writeline
+      IMPORTING
+        !io_abap_typedescr TYPE REF TO cl_abap_typedescr
+        !iv_val            TYPE any .
+ENDCLASS.
+
+
+
+CLASS ZCL_OLE2_OBJECT IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->ADD_HEADER_VIA_FCAT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_FCAT                        TYPE        LVC_T_FCAT
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_header_via_fcat.
+************************************************************************
+* @Importing@  IT_FCAT  -> Field Catalog for List Viewer Control
+************************************************************************
+    DATA: ls_fcat  TYPE lvc_s_fcat,
+          lt_lines TYPE gty_tt_string,
+          ls_lines TYPE gty_st_string.
+    " fcat
+    t_fcat = it_fcat.
+    "*-
+    LOOP AT it_fcat INTO ls_fcat.
+      IF ls_fcat-reptext IS NOT INITIAL.
+        ls_lines-val = ls_fcat-reptext.
+        APPEND ls_lines TO lt_lines.
+      ELSE.
+        ls_lines-val = ls_fcat-coltext.
+        APPEND ls_lines TO lt_lines.
+      ENDIF.
+      CLEAR: ls_lines.
+    ENDLOOP.
+    " Add line
+    me->add_line_via_tab( it_table = lt_lines ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->ADD_LINE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_LINE                        TYPE        ANY
+* | [--->] I_FCAT                         TYPE        CHAR1(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_line.
+************************************************************************
+* @Importing@	 IS_LINE  -> Line
+* @Importing@	 I_FCAT   -> Using field catalog match?
+************************************************************************
+    DATA: lo_abap_typedescr TYPE REF TO cl_abap_typedescr,
+          lv_counter        TYPE i,
+          ls_fcat           TYPE lvc_s_fcat.
+    FIELD-SYMBOLS: <lv_val> TYPE any.
+
+    CLEAR gs_data.
+    " fcat
+    IF i_fcat EQ 'X'.
+      LOOP AT t_fcat INTO ls_fcat.
+        ASSIGN COMPONENT ls_fcat-fieldname OF STRUCTURE is_line TO <lv_val>.
+        IF sy-subrc IS NOT INITIAL.
+          CONTINUE.
+        ENDIF.
+        " getType
+        lo_abap_typedescr = cl_abap_typedescr=>describe_by_data( p_data = <lv_val> ).
+        " Write line
+        me->writeline(
+                io_abap_typedescr = lo_abap_typedescr " Runtime Type Services
+                iv_val            = <lv_val> " Value
+            ).
+      ENDLOOP.
+    ELSE.
+      DO.
+        " check?
+        ADD 1 TO lv_counter.
+        ASSIGN COMPONENT lv_counter OF STRUCTURE is_line TO <lv_val>.
+        IF sy-subrc NE 0.
+          EXIT.
+        ENDIF.
+        " getType
+        lo_abap_typedescr = cl_abap_typedescr=>describe_by_data( p_data = <lv_val> ).
+        " Write line
+        me->writeline(
+                io_abap_typedescr = lo_abap_typedescr " Runtime Type Services
+                iv_val            = <lv_val> " Value
+        ).
+      ENDDO.
+    ENDIF.
+    "*-
+    SHIFT gs_data BY 1 PLACES LEFT.
+    APPEND gs_data TO gt_data.
+    CLEAR  gs_data.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->ADD_LINES_VIA_TAB
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_TABLE                       TYPE        ANY TABLE
+* | [--->] I_FCAT                         TYPE        CHAR1(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_lines_via_tab.
+************************************************************************
+* @Importing@  IT_TABLE  -> Table
+* @Importing@  I_FCAT    -> Using field catalog match?
+************************************************************************
+    FIELD-SYMBOLS: <ls_line> TYPE any.
+    "*-
+    LOOP AT it_table ASSIGNING <ls_line>.
+      me->add_line(
+          is_line = <ls_line>
+          i_fcat  = i_fcat " Using field catalog match?
+      ).
+    ENDLOOP.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->ADD_LINE_VIA_TAB
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_TABLE                       TYPE        GTY_TT_STRING
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_line_via_tab.
+************************************************************************
+* @Importing@  IT_TABLE  -> Table with Strings
+************************************************************************
+    DATA: ls_string TYPE gty_st_string.
+    "*-
+    CLEAR gs_data.
+    LOOP AT it_table INTO ls_string.
+      gs_data = gs_data && cl_abap_char_utilities=>horizontal_tab && ls_string-val.
+    ENDLOOP.
+    "*-
+    SHIFT gs_data BY 1 PLACES LEFT.
+    APPEND gs_data TO gt_data.
+    CLEAR  gs_data.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->CLEAR_CLIPBOARD
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD clear_clipboard.
+    CLEAR gt_data.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->CLIPBOARD_EXPORT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_ROW                          TYPE        I
+* | [--->] I_COL                          TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD clipboard_export.
+************************************************************************
+* @Importing@  I_ROW  -> Row
+* @Importing@  I_COL  -> Column
+************************************************************************
+    DATA: lv_rc    TYPE i,
+          ls_cells TYPE ole2_object.
+    " Flush
+    cl_gui_cfw=>flush(
+      EXCEPTIONS
+        cntl_system_error = 1
+        cntl_error        = 2
+        OTHERS            = 3
+    ).
+    IF sy-subrc IS NOT INITIAL.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    " Export
+    cl_gui_frontend_services=>clipboard_export(
+      IMPORTING
+        data                 = gt_data
+      CHANGING
+        rc                   = lv_rc
+      EXCEPTIONS
+        cntl_error           = 1
+        error_no_gui         = 2
+        not_supported_by_gui = 3
+        no_authority         = 4
+        OTHERS               = 5
+    ).
+    IF sy-subrc IS NOT INITIAL.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    " Paste
+    CALL METHOD OF worksheet 'Cells' = ls_cells
+      EXPORTING
+        #1 = i_row
+        #2 = i_col.
+    CALL METHOD OF ls_cells 'Select'.
+    CALL METHOD OF worksheet 'Paste'.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->CONSTRUCTOR
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_VISIBLE                      TYPE        I (default =1)
+* | [--->] I_WSNAME                       TYPE        CHAR30 (default ='Sheet1')
+* | [--->] I_WBNAME                       TYPE        CHAR30 (default ='Book1')
+* | [--->] I_PATH                         TYPE        STRING(optional)
+* | [--->] I_MODE                         TYPE        CHAR1 (default ='C')
+* | [EXC!] EMPTY_PATH
+* | [EXC!] MISSING_FILENAME
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD constructor.
+************************************************************************
+* @Importing@  I_VISIBLE         -> Visible? (1/0)
+* @Importing@  I_WSNAME          -> Worksheet name
+* @Importing@  I_WBNAME          -> Workbook name (Filename)
+* @Importing@  I_PATH            -> Path for Open/Create file
+* @Importing@  I_MODE            -> O:Open / C:Create
+* @Exception@  EMPTY_PATH        -> File/Folder path is not selected
+* @Exception@  MISSING_FILENAME  -> Filename is missing in path
+************************************************************************
+    DATA: lv_visible TYPE i,
+          lv_wsname  TYPE text30,
+          lv_wbname  TYPE text30,
+          lv_title   TYPE string,
+          lt_filetab TYPE filetable,
+          lv_rc      TYPE i.
+    " Path
+    IF i_path IS INITIAL.
+      CASE i_mode.
+        WHEN 'O'. " Open
+          cl_gui_frontend_services=>file_open_dialog(
+            EXPORTING
+              default_extension       = 'xlsx'           " Default Extension
+              file_filter             = 'Excel Workbook (*.xlsx)|*.xlsx|' &&
+                                        'Excel 97-2003 Workbook (*.xls)|*.xls|' " File Extension Filter String
+              initial_directory       = 'C:\'            " Initial Directory
+              multiselection          =  ''              " Multiple selections poss.
+            CHANGING
+              file_table              = lt_filetab       " Table Holding Selected Files
+              rc                      = lv_rc            " Return Code, Number of Files or -1 If Error Occurred
+            EXCEPTIONS
+              file_open_dialog_failed = 1
+              cntl_error              = 2
+              error_no_gui            = 3
+              not_supported_by_gui    = 4
+              OTHERS                  = 5
+          ).
+          IF sy-subrc <> 0.
+            MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                       WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+          ELSEIF lv_rc EQ 1.
+            path = lt_filetab[ 1 ]-filename.
+          ENDIF.
+        WHEN 'C'. " Create
+          cl_gui_frontend_services=>directory_browse(
+            EXPORTING
+              initial_folder       = 'C:\'     " Start Browsing Here
+            CHANGING
+              selected_folder      = path      " Folder Path Selected By User
+            EXCEPTIONS
+              cntl_error           = 1
+              error_no_gui         = 2
+              not_supported_by_gui = 3
+              OTHERS               = 4
+          ).
+          IF sy-subrc <> 0.
+            MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                       WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+          ENDIF.
+      ENDCASE.
+    ELSE.
+      path = i_path.
+    ENDIF.
+    " check path?
+    IF path IS INITIAL.
+      MESSAGE 'File/Folder path is not selected'(001) TYPE 'E' RAISING empty_path.
+    ENDIF.
+    " check if there is a filename in path or not?
+    FIND ALL OCCURRENCES OF
+      REGEX '[\w,\s-]+\.[A-Za-z]{3,4}$' IN path
+      MATCH COUNT  sy-tabix.
+    IF sy-subrc IS NOT INITIAL.
+      IF i_mode EQ 'O'.
+        MESSAGE 'Filename is missing in path'(002) TYPE 'E' RAISING missing_filename.
+      ENDIF.
+      " Workbook name
+      IF i_wbname IS INITIAL.
+        lv_wbname = 'Book1'.
+      ELSE.
+        lv_wbname = i_wbname.
+      ENDIF.
+      path = path && '\' && lv_wbname && '.xlsx'.
+      REPLACE ALL OCCURRENCES OF '\\' IN path WITH '\'.
+    ENDIF.
+    " visible?
+    IF i_visible NE 0 AND
+       i_visible NE 1.
+      lv_visible = 0.
+    ELSE.
+      lv_visible = i_visible.
+    ENDIF.
+    " Worksheet name
+    IF i_wsname IS INITIAL.
+      lv_wsname = 'Sheet1'.
+    ELSE.
+      lv_wsname = i_wsname.
+    ENDIF.
+    " Create object
+    me->create_object(
+        i_visible = lv_visible  " Visible?
+        i_wsname  = lv_wsname   " Worksheet Name
+        i_mode    = i_mode      " O:Open / C:Create
+    ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_OLE2_OBJECT->CONV_CM2INCH
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_INPUT                        TYPE        DEC5_2
+* | [<-()] R_OUTPUT                       TYPE        GTY_DEC_16_13
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD conv_cm2inch.
+************************************************************************
+* @Importing@  I_INPUT            -> Input value (cm)
+* @Returning@  value( R_OUTPUT )  -> Output value (inch)
+************************************************************************
+    " Measurement unit conversion
+    CALL FUNCTION 'UNIT_CONVERSION_SIMPLE'
+      EXPORTING
+        input                = i_input  " Input Value
+        unit_in              = 'CM'     " Unit of input value
+        unit_out             = 'IN'     " Unit of output value
+      IMPORTING
+        output               = r_output " Output value
+      EXCEPTIONS
+        conversion_not_found = 1
+        division_by_zero     = 2
+        input_invalid        = 3
+        output_invalid       = 4
+        overflow             = 5
+        type_invalid         = 6
+        units_missing        = 7
+        unit_in_not_found    = 8
+        unit_out_not_found   = 9
+        OTHERS               = 10.
+    IF sy-subrc IS NOT INITIAL.
+      r_output = 0.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_OLE2_OBJECT->CREATE_OBJECT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_VISIBLE                      TYPE        I
+* | [--->] I_WSNAME                       TYPE        CHAR30
+* | [--->] I_MODE                         TYPE        CHAR1 (default ='C')
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD create_object.
+************************************************************************
+* @Importing@  I_VISIBLE  -> Visible?
+* @Importing@  I_WSNAME   -> Worksheet name
+* @Importing@  I_MODE     -> O:Open / C:Create
+************************************************************************
+    " Application
+    CREATE OBJECT application 'Excel.Application'.
+    " Reference Style
+    SET PROPERTY OF application 'ReferenceStyle' = c_rs_r1c1.
+    " Window State
+    SET PROPERTY OF application 'WindowState' = c_ws_maximized.
+    " Workbooks
+    CALL METHOD OF application 'Workbooks' = workbooks.
+    IF i_mode EQ 'O'.
+      " Open workbook
+      CALL METHOD OF workbooks 'Open' = workbook
+        EXPORTING
+          #1 = path.
+      " Save
+      me->save_document(
+          i_visible     = i_visible
+          i_compcheck   = 0
+          i_replacefile = 1
+      ).
+    ELSE.
+      " Create workbook
+      CALL METHOD OF workbooks 'Add' = workbook.
+    ENDIF.
+    " Visible?
+    SET PROPERTY OF application 'Visible' = i_visible.
+    " Worksheet
+    GET PROPERTY OF application 'ActiveSheet' = worksheet.
+    SET PROPERTY OF worksheet 'Name' = i_wsname.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->FREE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_FORCE                        TYPE        CHAR1 (default ='X')
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD free.
+************************************************************************
+* @Importing@  I_FORCE  -> Force close
+************************************************************************
+    " Release & Free object
+    IF i_force EQ 'X'.
+      SET PROPERTY OF application 'DisplayAlerts ' = 0.
+    ENDIF.
+    "*-
+    CALL METHOD OF application 'Quit'.
+    FREE OBJECT application.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->GET_APP_OBJECT
+* +-------------------------------------------------------------------------------------------------+
+* | [<-()] R_APPLICATION                  TYPE        OLE2_OBJECT
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_app_object.
+************************************************************************
+* @Returning@  value( R_APPLICATION )  -> Application object
+************************************************************************
+    r_application = application.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->GET_ROW_COUNT
+* +-------------------------------------------------------------------------------------------------+
+* | [<-()] E_COUNT                        TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_row_count.
+************************************************************************
+* @Returning@  value( E_COUNT )  -> Row Count
+************************************************************************
+    " Clipboard table row count
+    e_count = lines( gt_data ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->GET_VALUE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_ROW                          TYPE        I
+* | [--->] I_COL                          TYPE        I
+* | [<-()] R_VALUE                        TYPE        CHAR1500
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_value.
+************************************************************************
+* @Importing@  I_ROW    -> Row
+* @Importing@  I_COL    -> Column
+* @Returning@  R_VALUE  -> Value
+************************************************************************
+    DATA: ls_cells TYPE ole2_object.
+    "*-
+    CALL METHOD OF worksheet 'Cells' = ls_cells
+      EXPORTING
+        #1 = i_row
+        #2 = i_col.
+    "*-
+    GET PROPERTY OF ls_cells 'Value' = r_value.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->PRINT
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD print.
+    " Print
+    CALL METHOD OF worksheet 'PrintOut'.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_OLE2_OBJECT=>READ_EXCEL
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] FILENAME                       TYPE        STRING
+* | [--->] HEADER_ROW                     TYPE        I (default =1)
+* | [--->] COLUMNS                        TYPE        I
+* | [<-->] TABLE                          TYPE        STANDARD TABLE
+* | [<-()] DATA                           TYPE REF TO DATA
+* | [EXC!] CONVERSION_ERROR
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD read_excel.
+    DATA : lt_records       TYPE solix_tab,
+           lv_headerxstring TYPE xstring,
+           lv_filelength    TYPE i.
+    FIELD-SYMBOLS: <fs_tab> TYPE STANDARD TABLE,
+                   <ls_tab> TYPE any,
+                   <fs>     TYPE any,
+                   <fs1>    TYPE any.
+*    FIELD-SYMBOLS <fs_tab> TYPE ANY TABLE.
+*-- Read the Input File
+
+*    cl_gui_frontend_services=>gui_upload(
+*      EXPORTING
+*        filename                = filename            " Name of file
+*        filetype                = 'BIN'            " File Type (ASCII, Binary)
+**      has_field_separator     = space            " Columns Separated by Tabs in Case of ASCII Upload
+**      header_length           = 0                " Length of Header for Binary Data
+**      read_by_line            = 'X'              " File Written Line-By-Line to the Internal Table
+**      dat_mode                = space            " Numeric and date fields are in DAT format in WS_DOWNLOAD
+**      codepage                =                  " Character Representation for Output
+**      ignore_cerr             = abap_true        " Ignore character set conversion errors?
+**      replacement             = '#'              " Replacement Character for Non-Convertible Characters
+**      virus_scan_profile      =                  " Virus Scan Profile
+**    IMPORTING
+**      filelength              =                  " File Length
+**      header                  =                  " File Header in Case of Binary Upload
+*    CHANGING
+*      data_tab                = table                 " Transfer table for file contents
+**      isscanperformed         = space            " File already scanned
+*    EXCEPTIONS
+*      file_open_error         = 1                " File does not exist and cannot be opened
+*      file_read_error         = 2                " Error when reading file
+*      no_batch                = 3                " Front-End Function Cannot Be Executed in Backgrnd
+*      gui_refuse_filetransfer = 4                " Incorrect front end or error on front end
+*      invalid_type            = 5                " Incorrect parameter FILETYPE
+*      no_authority            = 6                " No Upload Authorization
+*      unknown_error           = 7                " Unknown error
+*      bad_data_format         = 8                " Cannot Interpret Data in File
+*      header_not_allowed      = 9                " Invalid header
+*      separator_not_allowed   = 10               " Invalid separator
+*      header_too_long         = 11               " Header information currently restricted to 1023 bytes
+*      unknown_dp_error        = 12               " Error when calling data provider
+*      access_denied           = 13               " Access to File Denied
+*      dp_out_of_memory        = 14               " Not Enough Memory in DataProvider
+*      disk_full               = 15               " Storage Medium full
+*      dp_timeout              = 16               " Timeout of DataProvider
+*      not_supported_by_gui    = 17               " GUI does not support this
+*      error_no_gui            = 18               " GUI not available
+*      OTHERS                  = 19
+*      ).
+*    IF sy-subrc <> 0.
+**   MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+**     WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+*    ENDIF.
+    CALL FUNCTION 'GUI_UPLOAD'
+      EXPORTING
+        filename                = filename
+        filetype                = 'BIN'
+      IMPORTING
+        filelength              = lv_filelength
+        header                  = lv_headerxstring
+      TABLES
+        data_tab                = lt_records
+      EXCEPTIONS
+        file_open_error         = 1
+        file_read_error         = 2
+        no_batch                = 3
+        gui_refuse_filetransfer = 4
+        invalid_type            = 5
+        no_authority            = 6
+        unknown_error           = 7
+        bad_data_format         = 8
+        header_not_allowed      = 9
+        separator_not_allowed   = 10
+        header_too_long         = 11
+        unknown_dp_error        = 12
+        access_denied           = 13
+        dp_out_of_memory        = 14
+        disk_full               = 15
+        dp_timeout              = 16
+        OTHERS                  = 17.
+    IF sy-subrc IS NOT INITIAL.
+
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+
+    ENDIF.
+*--convert binary data to xstring
+
+    CALL FUNCTION 'SCMS_BINARY_TO_XSTRING'
+      EXPORTING
+        input_length = lv_filelength
+      IMPORTING
+        buffer       = lv_headerxstring
+      TABLES
+        binary_tab   = lt_records
+      EXCEPTIONS
+        failed       = 1
+        OTHERS       = 2.
+
+    IF sy-subrc IS NOT INITIAL.
+
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+
+    ENDIF.
+
+    DATA : lo_excel_ref TYPE REF TO cl_fdt_xl_spreadsheet .
+
+    TRY .
+        lo_excel_ref = NEW cl_fdt_xl_spreadsheet(
+          document_name = filename
+          xdocument     = lv_headerxstring ).
+      CATCH cx_fdt_excel_core.
+    ENDTRY .
+    IF lo_excel_ref IS BOUND.
+*--Get List of Worksheets
+      lo_excel_ref->if_fdt_doc_spreadsheet~get_worksheet_names(
+        IMPORTING
+          worksheet_names = DATA(lt_worksheets) ).
+
+      IF NOT lt_worksheets IS INITIAL.
+*-- Header Tab
+        READ TABLE lt_worksheets INTO DATA(lv_woksheetname) INDEX 1.
+
+        data = lo_excel_ref->if_fdt_doc_spreadsheet~get_itab_from_worksheet( lv_woksheetname ).
+        IF data IS BOUND.
+          ASSIGN data->* TO <fs_tab>.
+          IF <fs_tab> IS ASSIGNED.
+            DO header_row TIMES.
+              DELETE <fs_tab> INDEX 1  .
+            ENDDO.
+          ENDIF.
+        ENDIF.
+        DATA: ind TYPE i.
+        LOOP AT <fs_tab> ASSIGNING FIELD-SYMBOL(<fs_wa>).
+          IF <fs_wa> IS INITIAL.
+            CONTINUE.
+          ENDIF.
+          APPEND INITIAL LINE TO table[] ASSIGNING <ls_tab>.
+          DO columns TIMES.
+            ind = ind + 1.
+            ASSIGN COMPONENT ind OF STRUCTURE <fs_wa> TO <fs>.
+            IF <fs> IS ASSIGNED.
+              ASSIGN COMPONENT ind OF STRUCTURE <ls_tab> TO <fs1>.
+              IF <fs1> IS ASSIGNED.
+                TRY.
+                    <fs1> = <fs>.
+                  CATCH cx_sy_conversion_no_number.
+                    RAISE conversion_error.
+                ENDTRY.
+                UNASSIGN <fs1>.
+              ENDIF.
+              UNASSIGN <fs>.
+            ENDIF.
+          ENDDO.
+          CLEAR ind.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SAVE_DOCUMENT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_VISIBLE                      TYPE        I (default =1)
+* | [--->] I_COMPCHECK                    TYPE        I (default =0)
+* | [--->] I_REPLACEFILE                  TYPE        I (default =1)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD save_document.
+************************************************************************
+* @Importing@  I_VISIBLE      -> Show document after save (if created invisible)
+* @Importing@  I_COMPCHECK    -> Compability check?
+* @Importing@  I_REPLACEFILE  -> Replace file directly if found (no popup)
+************************************************************************
+    DATA: ls_cells    TYPE ole2_object,
+          ls_activewb TYPE ole2_object.
+    " Force window state to get maximized ( min->max )
+    SET PROPERTY OF application 'WindowState' = c_ws_minimized.
+    SET PROPERTY OF application 'WindowState' = c_ws_maximized.
+    " Alert Display
+    IF i_replacefile EQ 0.
+      SET PROPERTY OF application 'DisplayAlerts ' = 1.
+    ELSE.
+      SET PROPERTY OF application 'DisplayAlerts ' = 0.
+    ENDIF.
+    " Compability check?
+    CALL METHOD OF application 'ActiveWorkbook' = ls_activewb.
+    SET PROPERTY OF ls_activewb 'CheckCompatibility' = i_compcheck.
+    " Set cursor to top
+    CALL METHOD OF worksheet 'Cells' = ls_cells
+      EXPORTING
+        #1 = 1
+        #2 = 1.
+    CALL METHOD OF ls_cells 'Select'.
+    " Visible?
+    SET PROPERTY OF application 'Visible' = i_visible.
+    " SaveAs
+    CALL METHOD OF workbook 'SaveAs'
+      EXPORTING
+        #1 = path.
+    " Alert Display (back to default setting)
+    IF i_replacefile NE 0.
+      SET PROPERTY OF application 'DisplayAlerts ' = 1.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_ALIGNMENT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_BGNROW                       TYPE        I
+* | [--->] I_BGNCOL                       TYPE        I
+* | [--->] I_ENDROW                       TYPE        I
+* | [--->] I_ENDCOL                       TYPE        I
+* | [--->] I_HALIGN                       TYPE        I(optional)
+* | [--->] I_VALIGN                       TYPE        I(optional)
+* | [--->] I_WRAPTX                       TYPE        CHAR1(optional)
+* | [--->] I_ORIENT                       TYPE        I(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_alignment.
+************************************************************************
+* @Importing@  I_BGNROW -> Begin row
+* @Importing@  I_BGNCOL -> Begin column
+* @Importing@  I_ENDROW -> End row
+* @Importing@  I_ENDCOL -> End column
+* @Importing@  I_HALIGN -> Horizontal align
+* @Importing@  I_VALIGN -> Vertical align
+* @Importing@  I_WRAPTX -> Wrap-text
+* @Importing@  I_ORIENT -> Text-Orientation (-90<=..<=90)
+************************************************************************
+    DATA: ls_cellbgn TYPE ole2_object,
+          ls_cellend TYPE ole2_object,
+          ls_range   TYPE ole2_object.
+    " Select All
+    IF i_bgnrow EQ 0 AND
+       i_bgncol EQ 0 AND
+       i_endrow EQ 0 AND
+       i_endcol EQ 0.
+      CALL METHOD OF worksheet 'Cells' = ls_range.
+    ELSE.
+      " Select Range
+      CALL METHOD OF worksheet 'Cells' = ls_cellbgn
+        EXPORTING
+          #1 = i_bgnrow
+          #2 = i_bgncol.
+      CALL METHOD OF worksheet 'Cells' = ls_cellend
+        EXPORTING
+          #1 = i_endrow
+          #2 = i_endcol.
+      CALL METHOD OF worksheet 'Range' = ls_range
+        EXPORTING
+          #1 = ls_cellbgn
+          #2 = ls_cellend.
+    ENDIF.
+    CALL METHOD OF ls_range 'Select'.
+    " Horizontal
+    IF i_halign IS SUPPLIED.
+      SET PROPERTY OF ls_range 'HorizontalAlignment' = i_halign.
+    ENDIF.
+    " Vertical
+    IF i_valign IS SUPPLIED.
+      SET PROPERTY OF ls_range 'VerticalAlignment'   = i_valign.
+    ENDIF.
+    " Wrap text
+    IF i_wraptx EQ 'X'.
+      SET PROPERTY OF ls_range 'WrapText' = 1.
+    ENDIF.
+    " Text-Orientation
+    IF i_orient IS SUPPLIED AND
+       i_orient GE -90 AND
+       i_orient LE 90.
+      SET PROPERTY OF ls_range 'Orientation' = i_orient.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_AUTOFILL
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_SRC_BGNROW                   TYPE        I
+* | [--->] I_SRC_BGNCOL                   TYPE        I
+* | [--->] I_SRC_ENDROW                   TYPE        I
+* | [--->] I_SRC_ENDCOL                   TYPE        I
+* | [--->] I_DES_BGNROW                   TYPE        I
+* | [--->] I_DES_BGNCOL                   TYPE        I
+* | [--->] I_DES_ENDROW                   TYPE        I
+* | [--->] I_DES_ENDCOL                   TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_autofill.
+************************************************************************
+* @Importing@  I_SRC_BGNROW  -> Source Begin row
+* @Importing@  I_SRC_BGNCOL  -> Source Begin column
+* @Importing@  I_SRC_ENDROW  -> Source End row
+* @Importing@  I_SRC_ENDCOL  -> Source End column
+* @Importing@  I_DES_BGNROW  -> Destination Begin row
+* @Importing@  I_DES_BGNCOL  -> Destination Begin column
+* @Importing@  I_DES_ENDROW  -> Destination End row
+* @Importing@  I_DES_ENDCOL  -> Destination End column
+************************************************************************
+    DATA: ls_cellbgn   TYPE ole2_object,
+          ls_cellend   TYPE ole2_object,
+          ls_src_range TYPE ole2_object,
+          ls_des_range TYPE ole2_object.
+    " Select Source Range
+    CALL METHOD OF worksheet 'Cells' = ls_cellbgn
+      EXPORTING
+        #1 = i_src_bgnrow
+        #2 = i_src_bgncol.
+    CALL METHOD OF worksheet 'Cells' = ls_cellend
+      EXPORTING
+        #1 = i_src_endrow
+        #2 = i_src_endcol.
+    CALL METHOD OF worksheet 'Range' = ls_src_range
+      EXPORTING
+        #1 = ls_cellbgn
+        #2 = ls_cellend.
+    " Select Destination Range
+    CALL METHOD OF worksheet 'Cells' = ls_cellbgn
+      EXPORTING
+        #1 = i_des_bgnrow
+        #2 = i_des_bgncol.
+    CALL METHOD OF worksheet 'Cells' = ls_cellend
+      EXPORTING
+        #1 = i_des_endrow
+        #2 = i_des_endcol.
+    CALL METHOD OF worksheet 'Range' = ls_des_range
+      EXPORTING
+        #1 = ls_cellbgn
+        #2 = ls_cellend.
+    " AutoFill
+    CALL METHOD OF ls_src_range 'AutoFill'
+      EXPORTING
+        #1 = ls_des_range
+        #2 = 0. " xlFillDefault
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_AUTOFIT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_COL                          TYPE        CHAR10(optional)
+* | [--->] I_ROW                          TYPE        CHAR10(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_autofit.
+************************************************************************
+* @Importing@  I_COL  -> Column (ex:'2','B','A:DZ',''=All)
+* @Importing@  I_ROW  -> Row (ex:'2','1:5',''=All)
+************************************************************************
+    DATA: ls_columns TYPE ole2_object,
+          ls_rows    TYPE ole2_object.
+    " Column
+    IF i_col IS NOT INITIAL.
+      CALL METHOD OF worksheet 'Columns' = ls_columns
+          EXPORTING
+            #1 = i_col.
+    ELSE.
+      CALL METHOD OF worksheet 'Columns' = ls_columns.
+    ENDIF.
+    IF ls_columns IS NOT INITIAL.
+      CALL METHOD OF ls_columns 'Autofit'.
+    ENDIF.
+    " Row
+    IF i_row IS NOT INITIAL.
+      CALL METHOD OF worksheet 'Rows' = ls_rows
+          EXPORTING
+            #1 = i_row.
+    ELSE.
+      CALL METHOD OF worksheet 'Rows' = ls_rows.
+    ENDIF.
+    IF ls_rows IS NOT INITIAL.
+      CALL METHOD OF ls_rows 'Autofit'.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_BORDER
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_BGNROW                       TYPE        I
+* | [--->] I_BGNCOL                       TYPE        I
+* | [--->] I_ENDROW                       TYPE        I
+* | [--->] I_ENDCOL                       TYPE        I
+* | [--->] I_TRBLI                        TYPE        CHAR5
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_border.
+************************************************************************
+* @Importing@  I_BGNROW  -> Begin row
+* @Importing@  I_BGNCOL  -> Begin column
+* @Importing@  I_ENDROW  -> End row
+* @Importing@  I_ENDCOL  -> End column
+* @Importing@  I_TRBLI   -> Top-Right-Bottom-Left-Inside (ex:01010)
+************************************************************************
+    DATA: ls_cellbgn TYPE ole2_object,
+          ls_cellend TYPE ole2_object,
+          ls_range   TYPE ole2_object,
+          ls_borders TYPE ole2_object.
+    " Select All
+    IF i_bgnrow EQ 0 AND
+       i_bgncol EQ 0 AND
+       i_endrow EQ 0 AND
+       i_endcol EQ 0.
+      CALL METHOD OF worksheet 'Cells' = ls_range.
+    ELSE.
+      " Select Range
+      CALL METHOD OF worksheet 'Cells' = ls_cellbgn
+        EXPORTING
+          #1 = i_bgnrow
+          #2 = i_bgncol.
+      CALL METHOD OF worksheet 'Cells' = ls_cellend
+        EXPORTING
+          #1 = i_endrow
+          #2 = i_endcol.
+      CALL METHOD OF worksheet 'Range' = ls_range
+        EXPORTING
+          #1 = ls_cellbgn
+          #2 = ls_cellend.
+    ENDIF.
+    CALL METHOD OF ls_range 'Select'.
+    " Top
+    IF i_trbli(1) NE ''.
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '8'. " xlEdgeTop
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli(1).
+    ENDIF.
+    " Right
+    IF i_trbli+1(1) NE ''.
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '10'. "xlEdgeRight
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli+1(1).
+    ENDIF.
+    " Bottom
+    IF i_trbli+2(1) NE ''.
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '9'. "xlEdgeBottom
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli+2(1).
+    ENDIF.
+    " Left
+    IF i_trbli+3(1) NE ''.
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '7'. "xlEdgeLeft
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli+3(1).
+    ENDIF.
+    " Inside
+    IF i_trbli+4(1) NE ''.
+      " Vertical
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '11'. "xlInsideVertical
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli+4(1).
+      " Horizontal
+      CALL METHOD OF ls_range 'Borders' = ls_borders
+        EXPORTING
+          #1 = '12'. "xlInsideHorizontal
+      SET PROPERTY OF ls_borders 'LineStyle' = i_trbli+4(1).
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_COL_WIDTH
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_COL                          TYPE        CHAR10(optional)
+* | [--->] I_WIDTH                        TYPE        DEC5_2
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_col_width.
+************************************************************************
+* @Importing@  I_COL    -> Column (ex:'2','B','A:DZ',''=All)
+* @Importing@  I_WIDTH  -> Width
+************************************************************************
+    DATA: ls_columns TYPE ole2_object,
+          lv_i       TYPE i.
+    FIELD-SYMBOLS <lv_v> TYPE any.
+    "*-
+    IF i_col IS NOT INITIAL.
+      TRY.
+          " Numeric conv. for single column
+          lv_i = i_col.
+          ASSIGN lv_i TO <lv_v>.
+        CATCH cx_sy_conversion_no_number.
+          ASSIGN i_col TO <lv_v>.
+      ENDTRY.
+      CALL METHOD OF worksheet 'Columns' = ls_columns
+          EXPORTING
+            #1 = <lv_v>.
+    ELSE.
+      CALL METHOD OF worksheet 'Columns' = ls_columns.
+    ENDIF.
+    "*-
+    SET PROPERTY OF ls_columns 'ColumnWidth' = i_width.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_FORMAT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_BGNROW                       TYPE        I
+* | [--->] I_BGNCOL                       TYPE        I
+* | [--->] I_ENDROW                       TYPE        I
+* | [--->] I_ENDCOL                       TYPE        I
+* | [--->] I_FNAME                        TYPE        STRING(optional)
+* | [--->] I_FCOLOR                       TYPE        I(optional)
+* | [--->] I_FBOLD                        TYPE        I(optional)
+* | [--->] I_FSIZE                        TYPE        DEC5_2(optional)
+* | [--->] I_FITLC                        TYPE        I(optional)
+* | [--->] I_FULINE                       TYPE        I(optional)
+* | [--->] I_BCOLOR                       TYPE        I(optional)
+* | [--->] I_MERGE                        TYPE        CHAR1(optional)
+* | [--->] I_NFDEC                        TYPE        CHAR255(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_format.
+************************************************************************
+* @Importing@  I_BGNROW  -> Begin row
+* @Importing@  I_BGNCOL  -> Begin column
+* @Importing@  I_ENDROW  -> End row
+* @Importing@  I_ENDCOL  -> End column
+* @Importing@  I_FNAME   -> Font name (family)
+* @Importing@  I_FCOLOR  -> Font color
+* @Importing@  I_FBOLD   -> Font bold
+* @Importing@  I_FSIZE   -> Font size
+* @Importing@  I_FITLC   -> Font italic
+* @Importing@  I_FULINE  -> Font underline
+* @Importing@  I_BCOLOR  -> Background color
+* @Importing@  I_MERGE   -> Merge Cells
+* @Importing@  I_NFDEC   -> Number format (ex:'0.00')
+************************************************************************
+    DATA: ls_cellbgn  TYPE ole2_object,
+          ls_cellend  TYPE ole2_object,
+          ls_range    TYPE ole2_object,
+          ls_font     TYPE ole2_object,
+          ls_interior TYPE ole2_object.
+    " Select All
+    IF i_bgnrow EQ 0 AND
+       i_bgncol EQ 0 AND
+       i_endrow EQ 0 AND
+       i_endcol EQ 0.
+      CALL METHOD OF worksheet 'Cells' = ls_range.
+    ELSE.
+      " Select Range
+      CALL METHOD OF worksheet 'Cells' = ls_cellbgn
+        EXPORTING
+          #1 = i_bgnrow
+          #2 = i_bgncol.
+      CALL METHOD OF worksheet 'Cells' = ls_cellend
+        EXPORTING
+          #1 = i_endrow
+          #2 = i_endcol.
+      CALL METHOD OF worksheet 'Range' = ls_range
+        EXPORTING
+          #1 = ls_cellbgn
+          #2 = ls_cellend.
+    ENDIF.
+    CALL METHOD OF ls_range 'Select'.
+    GET PROPERTY OF ls_range 'Font' = ls_font.
+    " Font Name
+    IF i_fname IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Name' = i_fname.
+    ENDIF.
+    " Font Color
+    IF i_fcolor IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Color' = i_fcolor.
+    ENDIF.
+    " Font Bold
+    IF i_fbold IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Bold' = i_fbold.
+    ENDIF.
+    " Font Size
+    IF i_fsize IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Size' = i_fsize.
+    ENDIF.
+    " Font Italic
+    IF i_fitlc IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Italic' = i_fitlc.
+    ENDIF.
+    " Font Underline
+    IF i_fuline IS SUPPLIED.
+      SET PROPERTY OF ls_font 'Underline' = i_fuline.
+    ENDIF.
+    " Background Color
+    IF i_bcolor IS SUPPLIED.
+      GET PROPERTY OF ls_range 'Interior' = ls_interior.
+      SET PROPERTY OF ls_interior 'Color' = i_bcolor.
+    ENDIF.
+    " Merge
+    IF i_merge IS SUPPLIED.
+      CALL METHOD OF ls_range 'Merge'.
+    ENDIF.
+    " Number Format
+    IF i_nfdec IS SUPPLIED.
+*    " e.g.
+      " NumberFormat = "General"
+      " NumberFormat = "0.00","0.000","0" (Decimal)
+      " NumberFormat = "#,##0.00 $","#,##0 $" (Currency)
+      " NumberFormat = "dd/mm/yyyy;@","dd/mm/yy;@","[$-41F]d mmmm yyyy;@" (Date)
+      " NumberFormat = "hh:mm;@","hh:mm:ss;@" (Time)
+      " NumberFormat = "0.00%" (Percentage)
+      SET PROPERTY OF ls_range 'NumberFormat' = i_nfdec.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_IMAGE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_PATH                         TYPE        STRING
+* | [--->] I_LEFT                         TYPE        I
+* | [--->] I_TOP                          TYPE        I
+* | [--->] I_WIDTH                        TYPE        I
+* | [--->] I_HEIGHT                       TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_image.
+************************************************************************
+* @Importing@  I_PATH    -> Path
+* @Importing@  I_LEFT    -> Left
+* @Importing@  I_TOP     -> Top
+* @Importing@  I_WIDTH   -> Width
+* @Importing@  I_HEIGHT  -> Height
+************************************************************************
+    DATA: ls_shapes TYPE ole2_object.
+    "*-
+    GET PROPERTY OF worksheet 'Shapes' = ls_shapes.
+    CALL METHOD OF ls_shapes 'AddPicture'
+      EXPORTING
+        #1 = i_path    " Filename
+        #2 = '1'       " LinkToFile
+        #3 = '1'       " SaveWithDocument
+        #4 = i_left    " Left
+        #5 = i_top     " Top
+        #6 = i_width   " Width
+        #7 = i_height. " Height
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_PAGESETUP
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_FITTOPAGESWIDE               TYPE        I (default =1)
+* | [--->] I_FITTOPAGESTALL               TYPE        I (default =1)
+* | [--->] I_TOPMARGIN                    TYPE        DEC5_2(optional)
+* | [--->] I_RIGHTMARGIN                  TYPE        DEC5_2(optional)
+* | [--->] I_BOTTOMMARGIN                 TYPE        DEC5_2(optional)
+* | [--->] I_LEFTMARGIN                   TYPE        DEC5_2(optional)
+* | [--->] I_HEADERMARGIN                 TYPE        DEC5_2(optional)
+* | [--->] I_FOOTERMARGIN                 TYPE        DEC5_2(optional)
+* | [--->] I_ORIENTATION                  TYPE        I (default =C_ORI_PORTRAIT)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_pagesetup.
+************************************************************************
+* @Importing@  I_FITTOPAGESWIDE  -> Fit to pages wide
+* @Importing@  I_FITTOPAGESTALL  -> Fit to pages tall
+* @Importing@  I_TOPMARGIN       -> Top margin (cm)
+* @Importing@  I_RIGHTMARGIN     -> Right margin (cm)
+* @Importing@  I_BOTTOMMARGIN    -> Bottom margin (cm)
+* @Importing@  I_LEFTMARGIN      -> Left margin (cm)
+* @Importing@  I_HEADERMARGIN    -> Header margin (cm)
+* @Importing@  I_FOOTERMARGIN    -> Footer margin (cm)
+* @Importing@  I_ORIENTATION     -> Orientation
+************************************************************************
+    DATA: lv_p_16_13        TYPE gty_dec_16_13,
+          ls_inchestopoints TYPE ole2_object,
+          ls_pagesetup      TYPE ole2_object.
+    "*-
+    SET PROPERTY OF application 'PrintCommunication' = 1.
+    GET PROPERTY OF worksheet 'PageSetup' = ls_pagesetup.
+    SET PROPERTY OF ls_pagesetup 'PrintArea' = ''.
+    SET PROPERTY OF application 'PrintCommunication' = 0.
+    " fitToWide
+    SET PROPERTY OF ls_pagesetup 'FitToPagesWide' = i_fittopageswide.
+    " fitToTall
+    SET PROPERTY OF ls_pagesetup 'FitToPagesTall' = i_fittopagestall.
+    " Orientation
+    SET PROPERTY OF ls_pagesetup 'Orientation' = i_orientation.
+    " topMargin
+    IF i_topmargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_topmargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'TopMargin' = ls_inchestopoints.
+    ENDIF.
+    " rightMargin
+    IF i_rightmargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_rightmargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'RightMargin' = ls_inchestopoints.
+    ENDIF.
+    " bottomMargin
+    IF i_bottommargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_bottommargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'BottomMargin' = ls_inchestopoints.
+    ENDIF.
+    " leftMargin
+    IF i_leftmargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_leftmargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'LeftMargin' = ls_inchestopoints.
+    ENDIF.
+    " headerMargin
+    IF i_headermargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_headermargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'HeaderMargin' = ls_inchestopoints.
+    ENDIF.
+    " footerMargin
+    IF i_footermargin IS SUPPLIED.
+      lv_p_16_13 = conv_cm2inch( i_input = i_footermargin ).
+      CALL METHOD OF application 'InchesToPoints' = ls_inchestopoints
+        EXPORTING
+          #1 = lv_p_16_13.
+      SET PROPERTY OF ls_pagesetup 'FooterMargin' = ls_inchestopoints.
+    ENDIF.
+    "*-
+    SET PROPERTY OF application 'PrintCommunication' = 1.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_ROW_HEIGHT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_ROW                          TYPE        CHAR10(optional)
+* | [--->] I_HEIGHT                       TYPE        DEC5_2
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_row_height.
+************************************************************************
+* @Importing@  I_ROW     -> Row (ex:'2','1:5',''=All)
+* @Importing@  I_HEIGHT  -> Height
+************************************************************************
+    DATA: ls_rows TYPE ole2_object.
+    "*-
+    IF i_row IS NOT INITIAL.
+      CALL METHOD OF worksheet 'Rows' = ls_rows
+          EXPORTING
+            #1 = i_row.
+    ELSE.
+      CALL METHOD OF worksheet 'Rows' = ls_rows.
+    ENDIF.
+    "*-
+    SET PROPERTY OF ls_rows 'RowHeight' = i_height.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_OLE2_OBJECT->SET_VALUE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] I_ROW                          TYPE        I
+* | [--->] I_COL                          TYPE        I
+* | [--->] I_VALUE                        TYPE        SIMPLE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_value.
+************************************************************************
+* @Importing@  I_ROW    -> Row
+* @Importing@  I_COL    -> Column
+* @Importing@  I_VALUE  -> Value
+************************************************************************
+    DATA: ls_cells TYPE ole2_object.
+    "*-
+    CALL METHOD OF worksheet 'Cells' = ls_cells
+      EXPORTING
+        #1 = i_row
+        #2 = i_col.
+    "*-
+    SET PROPERTY OF ls_cells 'Value' = i_value.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_OLE2_OBJECT->WRITELINE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_ABAP_TYPEDESCR              TYPE REF TO CL_ABAP_TYPEDESCR
+* | [--->] IV_VAL                         TYPE        ANY
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD writeline.
+************************************************************************
+* @Importing@  IO_ABAP_TYPEDESCR  -> Runtime Type Services
+* @Importing@  IV_VAL             -> Value
+************************************************************************
+    DATA: lv_char TYPE char1500.
+    " Write
+    CASE io_abap_typedescr->type_kind.
+      WHEN io_abap_typedescr->typekind_char.   " C
+        WRITE iv_val TO lv_char.
+      WHEN io_abap_typedescr->typekind_num OR  " N
+           io_abap_typedescr->typekind_int OR  " I
+           io_abap_typedescr->typekind_packed. " P.
+        IF iv_val IS NOT INITIAL.
+          lv_char = CONV char1500( iv_val ).
+        ENDIF.
+      WHEN io_abap_typedescr->typekind_date.   " D
+        IF iv_val IS NOT INITIAL.
+          IF iv_val NA sy-abcde.
+            WRITE iv_val TO lv_char DD/MM/YYYY.
+          ELSE.
+            lv_char = CONV char1500( iv_val ).
+          ENDIF.
+        ENDIF.
+      WHEN io_abap_typedescr->typekind_time.   " T
+        IF iv_val IS NOT INITIAL.
+          IF iv_val NA sy-abcde.
+            WRITE iv_val TO lv_char ENVIRONMENT TIME FORMAT.
+          ELSE.
+            lv_char = CONV char1500( iv_val ).
+          ENDIF.
+        ENDIF.
+      WHEN OTHERS. " Others
+        WRITE iv_val TO lv_char.
+    ENDCASE.
+    gs_data = gs_data && cl_abap_char_utilities=>horizontal_tab && lv_char.
+  ENDMETHOD.
+ENDCLASS.

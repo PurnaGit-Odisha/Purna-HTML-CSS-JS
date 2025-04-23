@@ -1,0 +1,446 @@
+*&---------------------------------------------------------------------*
+*& Report ZINITIAL_STOCK_UPLOAD
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zscrap_stock_upload NO STANDARD PAGE HEADING LINE-SIZE 255.
+
+*&---------------------------------------------------------------------*
+*& Report ZINITIAL_STOCK_UPLOAD
+*&---------------------------------------------------------------------*
+*& Program Title          : Material Stock Upload Programs
+*& Module                 : MM
+*& Developed By           : RISHI RAJ
+*& Functional             : GOPAL SINGH
+*& T.Code                 : Z561
+*& Created on             :
+*&---------------------------------------------------------------------*
+*REPORT zinitial_stock_upload .
+
+INCLUDE ZINCL_SCRAP_UPLOAD.
+*INCLUDE zmm_data_decl_mat_stock_upload.
+
+TABLES : sscrfields.
+
+DATA : lv_filename TYPE string,
+       lv_filepath TYPE string,
+       lv_fullpath TYPE string.
+
+DATA: it_raw TYPE truxs_t_text_data.
+
+DATA : gv_gm_head_ret          TYPE bapi2017_gm_head_ret,
+       gv_gm_head_ret_mat_doc  TYPE bapi2017_gm_head_ret-mat_doc,
+       gv_gm_head_ret_doc_year TYPE bapi2017_gm_head_ret-doc_year,
+       lv1                     TYPE string,
+       lv2                     TYPE string,
+       lv3                     TYPE string.
+
+INITIALIZATION.
+
+*  ADD displayed text string to buttons
+  w_button = 'Download Excel Template'.
+
+AT SELECTION-SCREEN.
+
+  IF sscrfields-ucomm EQ 'BUT1' .
+    PERFORM download.
+  ENDIF.
+
+
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR  p_file.
+  PERFORM f4_help_for_file.
+*  PERFORM upload_data_in_it.
+*&---------------------------------------------------------------------*
+*& Form F4_HELP_FOR_FILE
+*&---------------------------------------------------------------------*
+*  START-OF-SELECTION.
+*
+**END-OF-SELECTION.
+FORM f4_help_for_file .
+
+  CALL FUNCTION 'F4_FILENAME'
+    EXPORTING
+      program_name  = syst-cprog
+      dynpro_number = syst-dynnr
+      field_name    = 'P_File'
+    IMPORTING
+      file_name     = p_file.
+
+  f_file = p_file.
+
+ENDFORM.
+
+FORM get_file_extension .
+**start get file extention
+  IF f_file = ''.
+    LEAVE SCREEN.
+  ELSE.
+    doc = f_file.
+*extract file extension
+    CALL FUNCTION 'DSVAS_DOC_FILENAME_SPLIT'
+      EXPORTING
+        pf_docid     = doc
+      IMPORTING
+        pf_directory = dir
+        pf_filename  = file_name
+        pf_extension = exten.
+    IF sy-subrc <> 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+      WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+*Validation for for file extension
+    IF exten <> 'xlsx' AND exten <> 'xls'.
+      MESSAGE i104(zsd_msg)."" DISPLAY LIKE 'I'.
+      f_file = ''.
+    ENDIF.
+  ENDIF.
+**end get file extention
+
+
+ENDFORM.
+
+
+*  PERFORM GET_FILE_EXTENSION.
+*  PERFORM UPLOAD_DATA_IN_IT.
+*&---------------------------------------------------------------------*
+*& Form UPLOAD_DATA_IN_IT
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+
+FORM upload_data_in_it .
+  IF f_file <> ''.
+
+    REFRESH : it_excel[], it_file[].
+*    IF EXTEN = 'xlsx' OR EXTEN = 'xls'.
+    CALL FUNCTION 'ALSM_EXCEL_TO_INTERNAL_TABLE'
+      EXPORTING
+        filename                = p_file
+        i_begin_col             = 1
+        i_begin_row             = 2
+        i_end_col               = 99
+        i_end_row               = 9999
+      TABLES
+        intern                  = it_excel
+      EXCEPTIONS
+        inconsistent_parameters = 1
+        upload_ole              = 2
+        OTHERS                  = 3.
+    IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+    ENDIF.
+
+*READ THE FILE ROW-WISE
+    LOOP AT it_excel INTO wa_excel.
+      CASE wa_excel-col .
+***start Initial Screen
+*Movement type
+        WHEN '2'.
+          wa_file-move_type = wa_excel-value.
+**SPECIAL STOCK
+*        WHEN '2'.
+*          wa_file-spec_stock = wa_excel-value.
+*Material Discription
+        WHEN '3'.
+          wa_file-material = wa_excel-value.
+*Quantity
+        WHEN '4'.
+          wa_file-entry_qnt = wa_excel-value.
+        WHEN '5'.
+          wa_file-entry_uom = wa_excel-value.
+*Storage location
+        WHEN '6'.
+          wa_file-stge_loc = wa_excel-value.
+*Batch
+        WHEN '7'.
+          wa_file-batch = wa_excel-value.
+*Date of Manufacture
+*        WHEN '7'.
+*          wa_file-prod_date = wa_excel-value.
+*Expiry date / Self life
+*        WHEN '8'.
+*          wa_file-expirydate = wa_excel-value.
+*Plant
+        WHEN '8'.
+          wa_file-plant = wa_excel-value.
+**AMOUNT_LC
+*        WHEN '10'.
+*          wa_file-amount_lc = wa_excel-value.
+**doc date
+*        WHEN '11'.
+*          wa_file-bldat = wa_excel-value.
+***posting date
+*        WHEN '12'.
+*          wa_file-budat = wa_excel-value.
+***Valuation Type
+*        WHEN '13'.
+*          wa_file-bwtar = wa_excel-value.
+***SO ORDER
+*        WHEN '14'.
+*          wa_file-wbs_elem = wa_excel-value.
+***SO ITEM
+*        WHEN '15'.
+*          wa_file-val_s_ord_item = wa_excel-value.
+***Item Text
+*        WHEN '16'.
+*          wa_file-item_text = wa_excel-value.
+**Number of Bags
+        WHEN '9'.
+          wa_file-mb_insmk = wa_excel-value.
+      ENDCASE.
+
+      AT END OF row.
+        APPEND wa_file TO it_file.
+        CLEAR wa_file.
+      ENDAT .
+    ENDLOOP.
+  ENDIF.
+ENDFORM.
+
+START-OF-SELECTION.
+  zcl_ole2_object=>read_excel( EXPORTING filename = |{ p_file }| columns = 9 CHANGING table = it_file[] ).
+* CALL FUNCTION 'TEXT_CONVERT_XLS_TO_SAP'
+*    EXPORTING
+**     I_FIELD_SEPERATOR    =
+*      i_line_header        = 'X'
+*      i_tab_raw_data       = it_raw       " WORK TABLE
+*      i_filename           = p_file
+*    TABLES
+*      i_tab_converted_data = it_file[]    "ACTUAL DATA
+*    EXCEPTIONS
+*      conversion_failed    = 1
+*      OTHERS               = 2.
+  LOOP AT it_file INTO wa_file.
+    PERFORM goodsmvt_header.
+    PERFORM goodsmvt_code.
+    PERFORM goodsmvt_item.
+    PERFORM bapi_fm.
+  ENDLOOP.
+*endloop.
+*&---------------------------------------------------------------------*
+*& Form GOODSMVT_HEADER
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM goodsmvt_header.
+
+*  CONCATENATE wa_file-budat+6(4) wa_file-budat+3(2) wa_file-budat(2)
+*  INTO wa_file-budat.
+*
+*  CONCATENATE wa_file-bldat+6(4) wa_file-bldat+3(2) wa_file-bldat(2)
+*  INTO wa_file-bldat.
+
+  it_bapi2017_gm_head_01-pstng_date = sy-datum.
+*  wa_file-budat.
+  it_bapi2017_gm_head_01-doc_date = sy-datum.
+*  wa_file-bldat.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GOODSMVT_CODE
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM goodsmvt_code .
+  it_bapi2017_gm_code-gm_code = '05'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form GOODSMVT_ITEM
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM goodsmvt_item .
+
+
+  CALL FUNCTION 'CONVERSION_EXIT_MATN1_INPUT'
+    EXPORTING
+      input        = wa_file-material
+    IMPORTING
+      output       = wa_file-material
+    EXCEPTIONS
+      length_error = 1
+      OTHERS       = 2.
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+
+*  CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+*    EXPORTING
+*      input  = wa_file-material
+*    IMPORTING
+*      output = wa_file-material.
+
+*  SPLIT wa_file-prod_date AT '.' INTO lv1 lv2 lv3.
+*  CONCATENATE lv3 lv2 lv1 INTO wa_file-prod_date.
+*  CLEAR : lv1, lv2 ,lv3.
+*
+*  SPLIT wa_file-expirydate AT '.' INTO lv1 lv2 lv3.
+*  CONCATENATE lv3 lv2 lv1 INTO wa_file-expirydate.
+*  CLEAR : lv1, lv2 ,lv3.
+
+  it_bapi2017_gm_item_create-move_type   = wa_file-move_type.
+*  it_bapi2017_gm_item_create-material    = wa_file-material.
+  it_bapi2017_gm_item_create-material_long    = wa_file-material.
+  it_bapi2017_gm_item_create-entry_qnt   = wa_file-entry_qnt.
+  it_bapi2017_gm_item_create-entry_uom    = wa_file-entry_uom.
+  it_bapi2017_gm_item_create-stge_loc    = wa_file-stge_loc.
+  it_bapi2017_gm_item_create-batch       = wa_file-batch.
+*  it_bapi2017_gm_item_create-val_type    = wa_file-batch.
+*  IF wa_file-prod_date IS NOT INITIAL.
+*    it_bapi2017_gm_item_create-prod_date   = sy-datum.
+*  ENDIF.
+*  IF wa_file-expirydate IS NOT INITIAL.
+*    it_bapi2017_gm_item_create-expirydate  = sy-datum.
+*  ENDIF.
+  it_bapi2017_gm_item_create-plant       = wa_file-plant.
+*  it_bapi2017_gm_item_create-amount_lc   = wa_file-amount_lc.
+*  it_bapi2017_gm_item_create-val_type    = wa_file-bwtar.
+
+*  it_bapi2017_gm_item_create-val_sales_ord   = wa_file-wbs_elem.
+*  it_bapi2017_gm_item_create-val_wbs_elem  = wa_file-wbs_elem.
+*  it_bapi2017_gm_item_create-val_s_ord_item  = wa_file-val_s_ord_item.
+*  it_bapi2017_gm_item_create-spec_stock    = wa_file-spec_stock.
+*  it_bapi2017_gm_item_create-item_text    = wa_file-item_text.
+  it_bapi2017_gm_item_create-stck_type   = wa_file-mb_insmk.
+
+  APPEND it_bapi2017_gm_item_create.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form BAPI_FM
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM bapi_fm .
+  CALL FUNCTION 'BAPI_GOODSMVT_CREATE'
+    EXPORTING
+      goodsmvt_header  = it_bapi2017_gm_head_01
+      goodsmvt_code    = it_bapi2017_gm_code
+    IMPORTING
+      goodsmvt_headret = gv_gm_head_ret
+      materialdocument = gv_gm_head_ret_mat_doc
+      matdocumentyear  = gv_gm_head_ret_doc_year
+    TABLES
+      goodsmvt_item    = it_bapi2017_gm_item_create
+      return           = it_bapiret2.
+
+CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+ EXPORTING
+   WAIT          = 'X'
+* IMPORTING
+*   RETURN        =
+          .
+
+*  WAIT UP TO 3 SECONDS.
+  DATA: mexmp TYPE migo_badi_exampl.
+*  LOOP AT it_file INTO wa_file.
+*    mexmp-mblnr = gv_gm_head_ret_mat_doc.
+*    mexmp-mjahr = gv_gm_head_ret_doc_year.
+*    SELECT SINGLE zeile
+*    INTO mexmp-zeile
+*    FROM matdoc
+*    WHERE mblnr = mexmp-mblnr
+*    AND   mjahr = mexmp-mjahr
+*    AND   charg = wa_file-batch.
+**    mexmp-zzbags = wa_file-zzbags.
+**    mexmp-zcharg = wa_file-batch.
+*    MODIFY migo_badi_exampl FROM mexmp.
+*    CLEAR mexmp.
+*  ENDLOOP.
+  DATA : error_message TYPE string.
+  IF gv_gm_head_ret_mat_doc IS NOT INITIAL.
+    WRITE: / 'Materials updated successfully', 50  gv_gm_head_ret_mat_doc , 70  gv_gm_head_ret_doc_year  .
+  ELSE.
+    LOOP AT it_bapiret2.
+      error_message = it_bapiret2-message && it_bapiret2-row.
+      WRITE: / error_message.
+      CLEAR : error_message.
+    ENDLOOP.
+  ENDIF.
+
+  PERFORM clear_str.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form CLEAR_STR
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM clear_str .
+
+  CLEAR it_bapi2017_gm_head_01.
+  CLEAR it_bapi2017_gm_code.
+  CLEAR it_bapi2017_gm_item_create.
+*CLEAR IT_BAPIRET2.
+*CLEAR IT_BAPIRET3.
+
+  REFRESH it_bapi2017_gm_head_01.
+  REFRESH it_bapi2017_gm_code.
+  REFRESH it_bapi2017_gm_item_create.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form download
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM download .
+  DATA: lo_obj TYPE REF TO zcl_ole2_object..
+  CREATE OBJECT lo_obj
+    EXPORTING
+      i_visible        = 0
+      i_wsname         = 'Sheet1'
+      i_wbname         = 'Initial Upload Format'
+    EXCEPTIONS
+      empty_path       = 1
+      missing_filename = 2
+      OTHERS           = 3.
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*   WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+  CHECK lo_obj IS BOUND.
+  lo_obj->set_value( i_row = 1 i_col = 1 i_value = 'Sr No' ).
+  lo_obj->set_value( i_row = 1 i_col = 2 i_value = 'Movement Type' ).
+*  lo_obj->set_value( i_row = 1 i_col = 2 i_value = 'Header Text' ).
+*  lo_obj->set_value( i_row = 1 i_col = 3 i_value = 'Vendor' ).
+*  lo_obj->set_value( i_row = 1 i_col = 4 i_value = 'Special Stock Indicator' ).
+  lo_obj->set_value( i_row = 1 i_col = 3 i_value = 'Material' ).
+  lo_obj->set_value( i_row = 1 i_col = 4 i_value = 'Entry Quantity' ).
+  lo_obj->set_value( i_row = 1 i_col = 5 i_value = 'Entry UOM' ).
+  lo_obj->set_value( i_row = 1 i_col = 6 i_value = 'Storage Location' ).
+  lo_obj->set_value( i_row = 1 i_col = 7 i_value = 'Batch' ).
+*  lo_obj->set_value( i_row = 1 i_col = 10 i_value = 'Date of Manufacture' ).
+*  lo_obj->set_value( i_row = 1 i_col = 11 i_value = 'Expiry date / Self life' ).
+  lo_obj->set_value( i_row = 1 i_col = 8 i_value = 'Plant' ).
+*  lo_obj->set_value( i_row = 1 i_col = 13 i_value = 'Amount in LC' ).
+*  lo_obj->set_value( i_row = 1 i_col = 14 i_value = 'Document Date' ).
+*  lo_obj->set_value( i_row = 1 i_col = 15 i_value = 'Posting Date' ).
+*  lo_obj->set_value( i_row = 1 i_col = 16 i_value = 'Valuation Type' ).
+*  lo_obj->set_value( i_row = 1 i_col = 17 i_value = 'Sales Order' ).
+*  lo_obj->set_value( i_row = 1 i_col = 18 i_value = 'SO Item' ).
+*  lo_obj->set_value( i_row = 1 i_col = 19 i_value = 'Item Text' ).
+  lo_obj->set_value( i_row = 1 i_col = 9 i_value = 'STOCK TYPE' ).
+  lo_obj->save_document( ).
+ENDFORM.

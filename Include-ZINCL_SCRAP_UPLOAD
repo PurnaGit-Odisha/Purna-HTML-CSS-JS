@@ -1,0 +1,145 @@
+*&---------------------------------------------------------------------*
+*& Include          ZMM_DATA_DECL_MAT_STOCK_UPLOAD
+*&---------------------------------------------------------------------*
+
+
+SELECTION-SCREEN BEGIN OF BLOCK 2 WITH FRAME TITLE TEXT-002.
+  PARAMETERS:p_file TYPE  localfile .."OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK 2.
+
+
+
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN BEGIN OF LINE.
+  SELECTION-SCREEN PUSHBUTTON (25) w_button USER-COMMAND but1.
+SELECTION-SCREEN END OF LINE.
+
+DATA: dir       TYPE dsvasdocid,  "store directory of file
+      file_name TYPE dsvasdocid, "store file name
+      exten     TYPE dsvasdocid,  " store file extension
+      doc       TYPE dsvasdocid. "store full path of file
+
+
+***start BAPI IT declaration.
+
+**** IMPORT PARAMATERS
+
+**** Goods Movement header
+
+DATA: BEGIN OF it_bapi2017_gm_head_01 OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_head_01.
+DATA: END OF it_bapi2017_gm_head_01.
+
+**** GOODSMVT_CODE
+
+DATA: BEGIN OF it_bapi2017_gm_code OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_code.
+DATA: END OF it_bapi2017_gm_code.
+
+**** TESTRUN
+
+DATA: BEGIN OF it_bapi2017_gm_gen OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_gen.
+DATA: END OF it_bapi2017_gm_gen.
+
+**** GOODSMVT_REF_EWM
+
+DATA: BEGIN OF it_/spe/bapi2017_gm_ref_ewm OCCURS 10.
+        INCLUDE STRUCTURE /spe/bapi2017_gm_ref_ewm.
+DATA: END OF it_/spe/bapi2017_gm_ref_ewm.
+
+**** GOODSMVT_PRINT_CTRL
+
+DATA: BEGIN OF it_bapi2017_gm_print OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_print.
+DATA: END OF it_bapi2017_gm_print.
+
+
+***** TABLES
+
+**** GOODSMVT_ITEM
+""""""""""""""""""""Added By knt
+DATA:bdcdata TYPE STANDARD TABLE OF bdcdata WITH HEADER LINE.
+DATA:bdcmsgcoll TYPE STANDARD TABLE OF bdcmsgcoll WITH HEADER LINE.
+""""""""""""""""""""Added By knt
+DATA: BEGIN OF it_bapi2017_gm_item_create OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_item_create.
+DATA: END OF it_bapi2017_gm_item_create.
+
+**** GOODSMVT_SERIALNUMBER
+
+DATA: BEGIN OF it_bapi2017_gm_serialnumber OCCURS 10.
+        INCLUDE STRUCTURE bapi2017_gm_serialnumber.
+DATA: END OF it_bapi2017_gm_serialnumber.
+
+****  RETURN
+
+DATA: BEGIN OF it_bapiret2 OCCURS 10.
+        INCLUDE STRUCTURE bapiret2.
+DATA: END OF it_bapiret2.
+
+**** GOODSMVT_SERV_PART_DATA
+
+DATA: BEGIN OF it_bapi2017_servicepart_data OCCURS 10.
+        INCLUDE STRUCTURE /spe/bapi2017_servicepart_data.
+DATA: END OF it_bapi2017_servicepart_data.
+
+**** EXTENSIONIN
+
+DATA: BEGIN OF it_bapiparex OCCURS 10.
+        INCLUDE STRUCTURE bapiparex.
+DATA: END OF it_bapiparex.
+
+***** GOODSMVT_ITEM_CWM
+
+DATA: BEGIN OF it_bapi2017_gm_item_create1 OCCURS 10.
+        INCLUDE STRUCTURE /cwm/bapi2017_gm_item_create.
+DATA: END OF it_bapi2017_gm_item_create1.
+
+********* End of BAPI IT Declaration*********************
+
+DATA : f_file TYPE string.
+
+DATA : it_excel TYPE STANDARD TABLE OF alsmex_tabline,
+       wa_excel TYPE alsmex_tabline.
+
+DATA: BEGIN OF it_bapiret3 OCCURS 10.
+        INCLUDE STRUCTURE bapiret2.
+DATA: END OF it_bapiret3.
+
+
+
+TYPES : BEGIN OF ty_itab,
+          sr_no          type i,
+          move_type      TYPE bapi2017_gm_item_create-move_type,       "  MOVEMENT TYPE
+*          header_txt     TYPE bapi2017_gm_head_01-header_txt,          "Header Text
+*          vendor         TYPE bapi2017_gm_item_create-vendor,          "Vendor
+*          spec_stock     TYPE bapi2017_gm_item_create-spec_stock,
+          material       TYPE bapi2017_gm_item_create-material_long,   " MATERIAL DIS
+          entry_qnt      TYPE bapi2017_gm_item_create-entry_qnt,       " Quantity
+          entry_uom      TYPE bapi2017_gm_item_create-entry_uom,       " Unit
+          stge_loc       TYPE bapi2017_gm_item_create-stge_loc,        " Storage location
+          batch          TYPE bapi2017_gm_item_create-batch,           " Batch
+*          prod_date(12)  TYPE c,                                   " TYPE BAPI2017_GM_ITEM_CREATE-PROD_DATE,  " Date of Manufacture
+*          expirydate(12) TYPE c,                                  "BAPI2017_GM_ITEM_CREATE-EXPIRYDATE, " Expiry date / Self life
+          plant          TYPE bapi2017_gm_item_create-plant,           " Plant
+*          amount_lc      TYPE bapi2017_gm_item_create-amount_lc,
+*          bldat(12)      TYPE c, "          TYPE bldat,
+*          budat(12)      TYPE c, "          TYPE budat,
+*          spec_stock     TYPE bapi2017_gm_item_create-spec_stock,      "" Special stock
+*          bwtar          TYPE mbew-bwtar,
+*          wbs_elem       TYPE bapi2017_gm_item_create-val_sales_ord,
+*          val_s_ord_item TYPE bapi2017_gm_item_create-val_s_ord_item,
+*          item_text      TYPE bapi2017_gm_item_create-item_text,        "Item Text
+          MB_INSMK       TYPE BAPI2017_GM_ITEM_CREATE-STCK_TYPE,
+        END OF ty_itab.
+
+
+DATA : it_file TYPE STANDARD TABLE OF ty_itab WITH HEADER LINE.
+DATA : wa_file TYPE ty_itab.
+
+DATA: BEGIN OF it_error OCCURS 0,
+        error TYPE string,
+      END OF it_error.
+
+DATA:  str2 TYPE string.
